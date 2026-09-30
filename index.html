@@ -1,1 +1,47 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Mini Game Hub</title><style>body{background:#0f172a;color:#fff;font-family:sans-serif;text-align:center;margin:0;padding:15px}h1{color:#ffcc00}.card{background:#fff;color:#1a2a44;max-width:400px;margin:20px auto;border-radius:15px;padding:20px}button{background:#1a2a44;color:#fff;border:0;padding:12px 20px;border-radius:10px;margin:5px;font-weight:bold}input,textarea{width:90%;padding:10px;margin:5px;border-radius:8px;border:1px solid #ccc}</style></head><body><h1>🎮 Mini Game Hub</h1><div class="card"><h2>🧮 Maths</h2><p id="q">Click Start</p><input id="ans" type="number"><br><button onclick="newQ()">Start</button><button onclick="check()">Check</button><p id="mScore">Score:0</p><p id="mMsg"></p></div><div class="card"><h2>✊ RPS</h2><button onclick="rps('rock')">Rock</button><button onclick="rps('paper')">Paper</button><button onclick="rps('scissor')">Scissor</button><p id="rMsg"></p><p id="rScore">You:0 Comp:0</p></div><div class="card"><h3>⭐ Write a Review</h3><input id="rName" placeholder="Your Name"><textarea id="rText" placeholder="Write your review here"></textarea><br><button onclick="addReview()" style="background:#ffcc00;color:#000">Send Review</button><div id="reviewList" style="text-align:left;margin-top:10px"></div></div><script>let a,b,op,ms=0;function newQ(){a=Math.floor(Math.random()*20)+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Game Hub - 4 Games</title>
+<style>
+body{background:#1a2332;color:white;font-family:Arial;text-align:center;margin:0;padding:15px}
+h1{color:#ffcc00}
+.card{background:white;color:#1a2332;border-radius:20px;padding:20px;margin:20px auto;max-width:420px}
+button{background:#1a2332;color:white;border:none;padding:10px 18px;border-radius:10px;margin:4px;font-weight:bold;cursor:pointer}
+input,textarea{padding:10px;border-radius:8px;border:1px solid #ccc;width:85%;margin:6px}
+canvas{background:#111;border-radius:10px}
+.tic{display:grid;grid-template-columns:repeat(3,80px);gap:5px;justify-content:center;margin:10px auto}
+.tic div{width:80px;height:80px;background:#1a2332;color:white;font-size:40px;display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>🎮 Mini Hub - 4 Games</h1>
+
+<div class="card"><h2>💻 Coding Quiz</h2><p id="codeQ">Click Start</p><input id="codeAns" placeholder="a/b/c/d"><br><button onclick="startCode()">Start</button><button onclick="checkCode()">Check</button><p>Score:<span id="codeScore">0</span></p></div>
+
+<div class="card"><h2>👊 RPS</h2><button onclick="playR('Rock')">Rock</button><button onclick="playR('Paper')">Paper</button><button onclick="playR('Scissor')">Scissor</button><p id="rps">You:0 Comp:0</p><p id="rps-res"></p></div>
+
+<div class="card"><h2>🐍 Snake</h2><canvas id="snake" width="300" height="300"></canvas><br><button onclick="changeDir('UP')">⬆️</button><br><button onclick="changeDir('LEFT')">⬅️</button><button onclick="changeDir('DOWN')">⬇️</button><button onclick="changeDir('RIGHT')">➡️</button><br><button onclick="startSnake()" style="background:green">Start Snake</button><p>Score:<span id="snakeScore">0</span></p></div>
+
+<div class="card"><h2>❌ Tic Tac Toe</h2><div class="tic" id="tic"></div><p id="ticStatus">X Turn</p><button onclick="resetTic()">Restart</button></div>
+
+<div class="card"><h2>⭐ Reviews</h2><input id="rName" placeholder="Your Name"><textarea id="rText" placeholder="Review"></textarea><br><button onclick="addReview()">Submit</button><div id="reviews" style="text-align:left;margin-top:10px"></div></div>
+
+<script>
+// CODING
+const codingQs=[{q:"HTML stands for? a) Hyper Text Markup Language b) High Tech Language",a:"a"},{q:"CSS used for? a) Logic b) Styling c) Database",a:"b"},{q:"JS tag? a) <script> b) <js>",a:"a"},{q:"Python comment? a) // b) #",a:"b"},{q:"2+'2' in JS=? a) 4 b) 22",a:"b"},{q:"What is Git? a) Version Control b) Language",a:"a"},{q:"Which is database? a) MySQL b) CSS",a:"a"},{q:"API means? a) Application Programming Interface b) App Internet",a:"a"},{q:"Which loop runs at least once? a) do-while b) for",a:"a"},{q:"React is? a) Library b) Database",a:"a"}];
+let currentQ,codeSc=0; function startCode(){currentQ=codingQs[Math.floor(Math.random()*codingQs.length)];document.getElementById('codeQ').innerText=currentQ.q;document.getElementById('codeAns').value='';} function checkCode(){let u=document.getElementById('codeAns').value.toLowerCase().trim();if(u===currentQ.a){codeSc++;document.getElementById('codeScore').innerText=codeSc;alert('Correct!');startCode();}else alert('Wrong! Ans:'+currentQ.a);} startCode();
+
+// RPS
+let you=0,comp=0; function playR(p){let c=['Rock','Paper','Scissor'][Math.floor(Math.random()*3)];let res='';if(p===c)res='Draw';else if((p==='Rock'&&c==='Scissor')||(p==='Paper'&&c==='Rock')||(p==='Scissor'&&c==='Paper')){you++;res='Win '+p+' beats '+c}else{comp++;res='Lose '+c+' beats '+p}document.getElementById('rps').innerText='You:'+you+' Comp:'+comp;document.getElementById('rps-res').innerText=res;}
+
+// SNAKE
+const canvas=document.getElementById('snake'),ctx=canvas.getContext('2d');let box=15,snake,food,dir,game,sScore;function startSnake(){snake=[{x:9*box,y:10*box}];food={x:Math.floor(Math.random()*19)*box,y:Math.floor(Math.random()*19)*box};dir='RIGHT';sScore=0;document.getElementById('snakeScore').innerText=0;clearInterval(game);game=setInterval(drawSnake,120);}function changeDir(d){if(d==='LEFT'&&dir!=='RIGHT')dir='LEFT';if(d==='UP'&&dir!=='DOWN')dir='UP';if(d==='RIGHT'&&dir!=='LEFT')dir='RIGHT';if(d==='DOWN'&&dir!=='UP')dir='DOWN';}function drawSnake(){ctx.fillStyle='#111';ctx.fillRect(0,0,300,300);for(let i=0;i<snake.length;i++){ctx.fillStyle=i==0?'#ffcc00':'#fff';ctx.fillRect(snake[i].x,snake[i].y,box-1,box-1);}ctx.fillStyle='red';ctx.fillRect(food.x,food.y,box-1,box-1);let hx=snake[0].x,hy=snake[0].y;if(dir==='LEFT')hx-=box;if(dir==='RIGHT')hx+=box;if(dir==='UP')hy-=box;if(dir==='DOWN')hy+=box;if(hx<0||hx>=300||hy<0||hy>=300||snake.some(s=>s.x===hx&&s.y===hy)){clearInterval(game);alert('Game Over Score:'+sScore);return;}let nh={x:hx,y:hy};if(hx===food.x&&hy===food.y){sScore++;document.getElementById('snakeScore').innerText=sScore;food={x:Math.floor(Math.random()*19)*box,y:Math.floor(Math.random()*19)*box};}else snake.pop();snake.unshift(nh);}
+
+// TIC TAC TOE
+let board=['','','','','','','','',''],turn='X',over=false;const ticDiv=document.getElementById('tic');function drawTic(){ticDiv.innerHTML='';board.forEach((v,i)=>{let d=document.createElement('div');d.innerText=v;d.onclick=()=>moveTic(i);ticDiv.appendChild(d);});}function moveTic(i){if(board[i]!==''||over)return;board[i]=turn;document.getElementById('ticStatus').innerText=turn+' moved';checkTic();turn=turn==='X'?'O':'X';if(!over)document.getElementById('ticStatus').innerText=turn+' Turn';drawTic();}function checkTic(){let wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(let w of wins){if(board[w[0]]&&board[w[0]]===board[w[1]]&&board[w[0]]===board[w[2]]){document.getElementById('ticStatus').innerText=board[w[0]]+' Wins!';over=true;return;}}if(!board.includes('')){document.getElementById('ticStatus').innerText='Draw!';over=true;}}function resetTic(){board=['','','','','','','','',''];turn='X';over=false;document.getElementById('ticStatus').innerText='X Turn';drawTic();}drawTic();
+
+function addReview(){let n=document.getElementById('rName').value,t=document.getElementById('rText').value;if(!n||!t){alert('Fill both');return;}let d=document.createElement('div');d.style="background:#eee;padding:8px;border-radius:8px;margin:5px";d.innerHTML='<b>'+n+'</b><br>'+t;document.getElementById('reviews').prepend(d);}
+</script>
+</body>
+</html>
