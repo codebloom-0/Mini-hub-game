@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Game Hub</title>
+<style>
+body{font-family:Arial;background:linear-gradient(135deg,#141e30,#243b55);color:white;text-align:center;padding:20px;margin:0;min-height:100vh}
+.menu button{background:white;color:#141e30;border:none;padding:12px 20px;margin:5px;border-radius:8px;font-weight:bold}
+.game{display:none;background:white;color:black;max-width:450px;margin:20px auto;padding:20px;border-radius:20px}
+.game.active{display:block}
+.game button{padding:10px 16px;margin:6px;border:none;border-radius:8px;background:#243b55;color:white}
+input{padding:12px;width:150px;border-radius:8px;border:2px solid #243b55;text-align:center;font-size:16px}
+.best{color:#243b55;background:#eef4ff;padding:8px;border-radius:6px;font-weight:bold;margin:10px 0}
+#quizOptions button{display:block;width:80%;margin:8px auto;background:#f1f1f1;color:black}
+</style>
+</head>
+<body>
+<h1>🎮 Mini Game Hub</h1>
+<div class="menu">
+<button onclick="showGame('guessing')">🧮 Maths Quiz</button>
+<button onclick="showGame('rps')">✊ Rock Paper</button>
+<button onclick="showGame('quiz')">🧠 Quiz Game</button>
+</div>
+
+<div id="guessing" class="game active">
+<h2>🧮 Maths Questions</h2>
+<p id="mathQuestion" style="font-size:28px;font-weight:bold;color:#141e30">Loading...</p>
+<div class="best">Best Streak: <span id="bestGuess">0</span></div>
+<input type="number" id="guessInput" placeholder="Answer">
+<button onclick="checkGuess()">Check</button>
+<p id="guessMessage">Good luck! 🍀</p>
+<p>Streak: <span id="attempts">0</span> | Score: <span id="mathScore">0</span></p>
+<button onclick="newGuessGame()">🔄 New Game</button>
+</div>
+
+<div id="rps" class="game">
+<h2>✊ Rock Paper Scissors</h2>
+<div class="best">Total Wins: <span id="totalWins">0</span></div>
+<button onclick="playRPS('Rock')">✊ Rock</button>
+<button onclick="playRPS('Paper')">📄 Paper</button>
+<button onclick="playRPS('Scissors')">✂️ Scissors</button>
+<h3 id="rpsResult">Choose one!</h3>
+<p>You: <span id="playerScore">0</span> | CPU: <span id="computerScore">0</span></p>
+<button onclick="resetRPS()">🔄 Reset</button>
+</div>
+
+<div id="quiz" class="game">
+<h2>🧠 Computer Quiz</h2>
+<div class="best">High Score: <span id="highQuiz">0</span> / 4</div>
+<p id="question"></p>
+<div id="quizOptions"></div>
+<p id="quizResult"></p>
+<p>Score: <span id="quizScore">0</span></p>
+<button onclick="nextQuestion()">Next ➡️</button>
+<button onclick="restartQuiz()">🔄 Restart</button>
+</div>
+
+<script>
+function showGame(id){document.querySelectorAll(".game").forEach(g=>g.classList.remove("active"));document.getElementById(id).classList.add("active")}
+let num1,num2,operator,secretNumber,attempts=0,mathScore=0;let bestGuess=localStorage.getItem("bestMath")||0;document.getElementById("bestGuess").innerText=bestGuess;
+function generateQuestion(){let ops=['+','-','x'];operator=ops[Math.floor(Math.random()*3)];num1=Math.floor(Math.random()*20)+1;num2=Math.floor(Math.random()*20)+1;if(operator==='+')secretNumber=num1+num2;if(operator==='-'){if(num2>num1){let t=num1;num1=num2;num2=t}secretNumber=num1-num2}if(operator==='x'){num1=Math.floor(Math.random()*12)+1;num2=Math.floor(Math.random()*12)+1;secretNumber=num1*num2}document.getElementById("mathQuestion").innerText=`What is ${num1} ${operator} ${num2}?`;document.getElementById("guessInput").value="";document.getElementById("guessInput").focus();}
+function checkGuess(){let v=document.getElementById("guessInput").value;if(v==="")return;let g=Number(v);if(g===secretNumber){mathScore+=10;attempts++;document.getElementById("guessMessage").innerText="🎉 Correct!";if(attempts>Number(bestGuess)){bestGuess=attempts;localStorage.setItem("bestMath",bestGuess);document.getElementById("bestGuess").innerText=bestGuess}generateQuestion();}else{document.getElementById("guessMessage").innerText=`❌ Wrong! Ans was ${secretNumber}`;attempts=0;generateQuestion();}document.getElementById("attempts").innerText=attempts;document.getElementById("mathScore").innerText=mathScore;}
+function newGuessGame(){mathScore=0;attempts=0;document.getElementById("attempts").innerText="0";document.getElementById("mathScore").innerText="0";generateQuestion();}
+generateQuestion();document.getElementById("guessInput").addEventListener("keypress",e=>{if(e.key==="Enter")checkGuess()});
+let playerScore=Number(localStorage.getItem("rpsPlayer")||0),computerScore=Number(localStorage.getItem("rpsCPU")||0),totalWins=Number(localStorage.getItem("rpsWins")||0);document.getElementById("playerScore").innerText=playerScore;document.getElementById("computerScore").innerText=computerScore;document.getElementById("totalWins").innerText=totalWins;
+function playRPS(p){let c=["Rock","Paper","Scissors"],cc=c[Math.floor(Math.random()*3)],r;if(p===cc)r="🤝 Draw!";else if((p==="Rock"&&cc==="Scissors")||(p==="Paper"&&cc==="Rock")||(p==="Scissors"&&cc==="Paper")){r="🎉 You Win!";playerScore++;totalWins++;}else{r="💻 CPU Wins!";computerScore++;}localStorage.setItem("rpsPlayer",playerScore);localStorage.setItem("rpsCPU",computerScore);localStorage.setItem("rpsWins",totalWins);document.getElementById("rpsResult").innerText=`You: ${p} | CPU: ${cc} → ${r}`;document.getElementById("playerScore").innerText=playerScore;document.getElementById("computerScore").innerText=computerScore;document.getElementById("totalWins").innerText=totalWins;} 
+function resetRPS(){playerScore=0;computerScore=0;localStorage.setItem("rpsPlayer",0);localStorage.setItem("rpsCPU",0);document.getElementById("playerScore").innerText="0";document.getElementById("computerScore").innerText="0";document.getElementById("rpsResult").innerText="Choose onelet questions=[{question:"Which language makes websites interactive?",options:["HTML","CSS","JavaScript","Python"],answer:"JavaScript"},{question:"What does HTML stand for?",options:["Hyper Text Markup Language","High Text Machine Language","Hyper Tool Markup Language","Home Text Markup Language"],answer:"Hyper Text Markup Language"},{question:"Which language is used for styling?",options:["HTML","CSS","Python","Java"],answer:"CSS"},{question:"Which symbol is for ID in CSS?",options:[".","#","@","&"],answer:"#"}];
+let currentQuestion=0,quizScore=0;let highQuiz=Number(localStorage.getItem("highQuiz")||0);document.getElementById("highQuiz").innerText=highQuiz;
+function loadQuestion(){let cur=questions[currentQuestion];document.getElementById("question").innerText=cur.question;let box=document.getElementById("quizOptions");box.innerHTML="";cur.options.forEach(o=>{let b=document.createElement("button");b.innerText=o;b.onclick=()=>checkAnswer(o);box.appendChild(b)});document.getElementById("quizResult").innerText="";}
+function checkAnswer(s){if(s===questions[currentQuestion].answer){quizScore++;document.getElementById("quizResult").innerText="✅ Correct!"}else{document.getElementById("quizResult").innerText="❌ Wrong! Correct: "+questions[currentQuestion].answer}document.getElementById("quizScore").innerText=quizScore;}
+function nextQuestion(){currentQuestion++;if(currentQuestion>=questions.length){if(quizScore>highQuiz){highQuiz=quizScore;localStorage.setItem("highQuiz",highQuiz);document.getElementById("highQuiz").innerText=highQuiz}document.getElementById("question").innerText="🎉 Quiz Finished!";document.getElementById("quizOptions").innerHTML="";document.getElementById("quizResult").innerText="Final: "+quizScore+" / "+questions.length;return}loadQuestion();}
+function restartQuiz(){currentQuestion=0;quizScore=0;document.getElementById("quizScore").innerText="0";loadQuestion();}
+loadQuestion();
+</script>
+</body>
+</html>
